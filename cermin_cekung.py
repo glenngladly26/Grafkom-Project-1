@@ -10,14 +10,13 @@ def draw_line(canvas, x1, y1, x2, y2, r, g ,b):
     dx = x2 - x1
     dy = y2 - y1
 
-    # menentukan 
-    steps = max(abs(dx), abs(dy))
-    
-    if steps != 0:
-        x_increment = dx / steps
-        y_increment = dy / steps
+    if abs(dx) > abs(dy):
+        steps = abs(dx)
     else:
-        x_increment = y_increment = 0
+        steps = abs(dy)
+
+    x_increment = dx / steps
+    y_increment = dy / steps
 
     # inisialisasi koordinat awal
     x = x1
@@ -33,13 +32,20 @@ def draw_line_modif(canvas, x1, y1, x2, y2, r, g ,b):
     dx = x2 - x1
     dy = y2 - y1
 
-    steps = max(abs(dx), abs(dy))
-    
-    if steps != 0:
-        x_increment = dx / steps
-        y_increment = dy / steps
+    if abs(dx) > abs(dy):
+        if abs(dx) == 0:
+            steps = 1
+        else:
+            steps = abs(dx)
     else:
-        x_increment = y_increment = 0
+        if abs(dy) == 0:
+            steps = -1
+        else:
+            steps = abs(dy)
+        
+    
+    x_increment = dx / steps
+    y_increment = dy / steps
 
     x = x1
     y = y1
@@ -69,12 +75,19 @@ def jarak_bayangan(jarak_benda, titik_fokus):
 		s = 1/(1/(titik_fokus) - 1/(jarak_benda))
 		return s
 
-def tinggi_bayangan(d, h, dB):
-    try:
-        hB = (dB / d) * h
-        return max(1, hB)
-    except ZeroDivisionError:
-        return 1
+def pembesaran(jarak_benda, titik_fokus):
+	varDummy = jarak_benda
+	if ZeroDivisionError():
+		varDummy += 0.1
+		M = jarak_bayangan(jarak_benda, titik_fokus)/(varDummy)
+		return (M)
+	else:
+		M = jarak_bayangan()/(jarak_benda)
+		return (M)
+
+def tinggi_bayangan(tinggi_benda, jarak_benda, titik_fokus):
+    tinggi_bayang = pembesaran(jarak_benda, titik_fokus)*(tinggi_benda)
+    return tinggi_bayang
 
 def gambar_garis_vertikal_dan_horizontal(canvas, width, height):
     x1, y1 = int(width / 2), 0
@@ -85,19 +98,58 @@ def gambar_garis_vertikal_dan_horizontal(canvas, width, height):
     x2, y2 = width, height / 2
     draw_line(canvas, x1, y1, x2, y2, 0, 0, 0)
 
-def gambar_titik_fokus(canvas, red, width, height, titik_fokus):
+def gambar_titik_fokus(canvas, red, width, height, titik_fokus, font):
     x1, y1 = konv_layar(titik_fokus, 1, width, height)
-    x2, y2 = konv_layar(titik_fokus, -1, width, height)
-    pygame.draw.line(canvas, red, (x1,y1), (x2,y2), 5)
+    pygame.draw.circle(canvas, red, (x1, height // 2), 3)
+    
+    #Label
+    label_titik_fokus = font.render("F", True, (0, 0, 0))
+    text_rect = label_titik_fokus.get_rect(center=(x1, y1 - 10))
+    canvas.blit(label_titik_fokus, text_rect)
 
-def gambar_benda(canvas, width, height, jarak_benda, tinggi_benda):
+def titik_R(canvas, red, titik_fokus, width, height, font):
+    x1, y1 =  konv_layar((2*titik_fokus), 1, width, height )
+    pygame.draw.circle(canvas, red, (x1, y1), 3)
+
+    label_titik_R = font.render("R", True, (0, 0, 0))
+    text_rect = label_titik_R.get_rect(center=(x1, y1 - 10))
+    canvas.blit(label_titik_R, text_rect)
+
+
+def gambar_benda(canvas, width, height, jarak_benda, tinggi_benda, font):
     x1, y1 = konv_layar(jarak_benda, 0, width, height)
     x2, y2 = konv_layar(jarak_benda, tinggi_benda, width, height)
     draw_line(canvas, x1, y1, x2, y2, 255,0,0)
 
-def gambar_bayangan(canvas, width, height, jarakBayangan, tinggiBayangan):
+    label_benda = font.render("Object", True, (255, 0, 0))
+    text_rect = label_benda.get_rect(center=(x1, y1 - (tinggi_benda + 10)))
+    canvas.blit(label_benda, text_rect)
+
+    #Gambar segitiga
+    x1, y1 = konv_layar(jarak_benda, tinggi_benda, width, height)
+    x2, y2 = konv_layar((jarak_benda - 30), 0, width, height)
+    draw_line(canvas, x1, y1, x2, y2, 255,0,0)
+
+    x1, y1 = konv_layar(jarak_benda, tinggi_benda, width, height)
+    x2, y2 = konv_layar((jarak_benda + 30), 0, width, height)
+    draw_line(canvas, x1, y1, x2, y2, 255,0,0)
+    
+def gambar_bayangan(canvas, width, height, jarakBayangan, tinggiBayangan, font):
     x1, y1 = konv_layar(jarakBayangan, 0, width, height)
     x2, y2 = konv_layar(jarakBayangan, -tinggiBayangan, width, height)
+    draw_line(canvas, x1, y1, x2, y2, 255,0,0,)
+
+    label_bayangan = font.render("Shadow", True, (255, 0, 0))
+    text_rect = label_bayangan.get_rect(center=(x1, y1 + (tinggiBayangan + 10)))
+    canvas.blit(label_bayangan, text_rect)
+
+    #Gambarnya
+    x1, y1 = konv_layar(jarakBayangan, -tinggiBayangan, width, height)
+    x2, y2 = konv_layar((jarakBayangan - 30), 0, width, height)
+    draw_line(canvas, x1, y1, x2, y2, 255,0,0,)
+
+    x1, y1 = konv_layar(jarakBayangan, -tinggiBayangan, width, height)
+    x2, y2 = konv_layar((jarakBayangan + 30), 0, width, height)
     draw_line(canvas, x1, y1, x2, y2, 255,0,0,)
 
 def gambar_garis_istimewa_1(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan):
@@ -111,7 +163,7 @@ def gambar_garis_istimewa_1(canvas, width, height, titik_fokus, jarak_benda, tin
 
     x1, y1 = konv_layar(titik_fokus, 0, width, height)
     x2, y2 = konv_layar(jarakBayangan, -tinggiBayangan, width, height)
-    draw_line(canvas, x1, y1, x2, y2, 66, 66, 245)
+    draw_line_modif(canvas, x1, y1, x2, y2, 66, 66, 245)
 
 def gambar_garis_istimewa_2(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan):
     x1, y1 = konv_layar(titik_fokus, 0, width, height)
@@ -133,13 +185,15 @@ def main():
     canvas.fill(bg_color)
     red = (255,0,0)
 
-    slider_jarakBenda = Slider(canvas, 40, 20, 300, 10, min=0, max=400, step=1)
+    font = pygame.font.Font(None, 20)
+
+    slider_jarakBenda = Slider(canvas, 40, 20, 300, 10, min=10, max=410, step=1)
     output_jarakBenda = TextBox(canvas, 750, 20, 34, 31, fontSize=16)
 
-    slider_tinggiBenda = Slider(canvas, 40, 50, 300, 10, min=0, max=300, step=1)
+    slider_tinggiBenda = Slider(canvas, 40, 50, 300, 10, min=10, max=310, step=1)
     output_tinggiBenda = TextBox(canvas, 750, 50, 34, 31, fontSize=16)
 
-    slider_jarakFokus = Slider(canvas, 40, 80, 300, 10, min=0, max=200, step=1)
+    slider_jarakFokus = Slider(canvas, 40, 80, 300, 10, min=10, max=210, step=1)
     output_jarakFokus = TextBox(canvas, 750, 80, 34, 31, fontSize=16)
 
     output_jarakBenda.disable()
@@ -162,14 +216,17 @@ def main():
         jarak_benda = slider_jarakBenda.getValue()
         tinggi_benda = slider_tinggiBenda.getValue()
         titik_fokus = slider_jarakFokus.getValue()
+        
+
         jarakBayangan = int(jarak_bayangan(jarak_benda, titik_fokus))
-        tinggiBayangan = int(tinggi_bayangan(jarak_benda, tinggi_benda, jarakBayangan))
+        tinggiBayangan = int(tinggi_bayangan(tinggi_benda, jarak_benda, titik_fokus))
 
         #menggambar 
         gambar_garis_vertikal_dan_horizontal(canvas, width, height)
-        gambar_titik_fokus(canvas, red, width, height, titik_fokus)
-        gambar_benda(canvas, width, height, jarak_benda, tinggi_benda)
-        gambar_bayangan(canvas, width, height, jarakBayangan, tinggiBayangan)
+        gambar_titik_fokus(canvas, red, width, height, titik_fokus, font)
+        titik_R(canvas, red, titik_fokus, width,height, font)
+        gambar_benda(canvas, width, height, jarak_benda, tinggi_benda, font)
+        gambar_bayangan(canvas, width, height, jarakBayangan, tinggiBayangan, font)
         gambar_garis_istimewa_1(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan)
         gambar_garis_istimewa_2(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan)
 
