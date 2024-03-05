@@ -53,7 +53,13 @@ def draw_line_modif(canvas, x1, y1, x2, y2, r, g ,b):
     width, height = 800, 600
     
     while 0 <= round(x) < width and 0 <= round(y) < height:
-        canvas.set_at((int(x), int(y)), warna)
+        if x > width / 2:
+            # Jika ya, gambar titik putus-putus
+            if int(x) % 10 < 5:
+                canvas.set_at((int(x), int(y)), warna)
+        else:
+            # Jika tidak, gambar titik seperti biasa
+            canvas.set_at((int(x), int(y)), warna)
         x += x_increment
         y += y_increment
 
@@ -169,32 +175,44 @@ def gambar_bayangan(canvas, width, height, jarakBayangan, tinggiBayangan, font):
     draw_line(canvas, x1, y1, x2, y2, 255,0,0,)
 
 def gambar_garis_istimewa_1(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan):
+    # garis dari benda ke cermin
     x1, y1 = konv_layar(0, tinggi_benda, width, height)
     x2, y2 = konv_layar(jarak_benda,tinggi_benda,width, height)
     draw_line_modif(canvas, x1, y1, x2, y2, 66, 66, 245)
 
+    # garis pantulan dari cermin ke bayangan
+    x1, y1 = konv_layar(0, tinggi_benda, width, height)
+    x2, y2 = konv_layar(jarakBayangan, -tinggiBayangan, width, height)
+    draw_line_modif(canvas, x1, y1, x2, y2, 66, 66, 245)
+    
     x1, y1 = konv_layar(0, tinggi_benda, width, height)
     x2, y2 = konv_layar(titik_fokus, 0, width, height)
     draw_line_modif(canvas, x1, y1, x2, y2, 66, 66, 245)
 
-    x1, y1 = konv_layar(titik_fokus, 0, width, height)
-    x2, y2 = konv_layar(jarakBayangan, -tinggiBayangan, width, height)
-    draw_line_modif(canvas, x1, y1, x2, y2, 66, 66, 245)
-
-def gambar_garis_istimewa_2(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan):
-    x1, y1 = konv_layar(titik_fokus, 0, width, height)
-    x2, y2 = konv_layar(jarak_benda, tinggi_benda, width, height)
-    draw_line_modif(canvas, x1, y1, x2, y2, 1, 117, 24)
-
-    x1, y1 = konv_layar(titik_fokus, 0, width, height)
-    x2, y2 = konv_layar(0, -tinggiBayangan, width, height)
-    draw_line(canvas, x1, y1, x2, y2, 1, 117, 24)
-
+def gambar_garis_istimewa_2(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan):  
+    #dari cermin ke bayangan
     x1, y1 = konv_layar(0, -tinggiBayangan, width, height)
     x2, y2 = konv_layar(jarakBayangan, -tinggiBayangan, width, height)
     draw_line_modif(canvas, x1, y1, x2, y2, 1, 117, 24)
 
+    #dari cermin ke benda
+    x1, y1 = konv_layar(0, -tinggiBayangan, width, height)
+    x2, y2 = konv_layar(jarak_benda, tinggi_benda, width, height)
+    draw_line_modif(canvas, x1, y1, x2, y2, 1, 117, 24)
 
+    x1, y1 = konv_layar(jarakBayangan, -tinggiBayangan, width, height)
+    x2, y2 = konv_layar((jarakBayangan + 10), -tinggiBayangan, width, height)
+    draw_line_modif(canvas, x1, y1, x2, y2, 1, 117, 24)
+
+def gambar_garis_istimewa_3(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan):
+    x1, y1 = konv_layar((2*titik_fokus), 0, width, height)
+    x2, y2 = konv_layar(jarak_benda, tinggi_benda, width, height)
+    draw_line_modif(canvas, x1, y1, x2, y2, 0, 0, 0)
+
+    x1, y1 = konv_layar(jarak_benda, tinggi_benda, width, height)
+    x2, y2 = konv_layar((2*titik_fokus), 0, width, height)
+    draw_line_modif(canvas, x1, y1, x2, y2, 0, 0, 0)
+ 
 def main():
     width, height = 800, 600
     canvas = pygame.display.set_mode((width, height))
@@ -204,19 +222,30 @@ def main():
 
     font = pygame.font.Font(None, 20)
 
-    slider_jarakBenda = Slider(canvas, 40, 20, 300, 10, min=10, max=410, step=1)
-    output_jarakBenda = TextBox(canvas, 750, 20, 34, 31, fontSize=16)
+    slider_jarakBenda = Slider(canvas, 40, 20, 300, 10, min=30, max=400, step=1)
+    output_jarakBenda = TextBox(canvas, 750, 20, 40, 31, fontSize=16)
 
     slider_tinggiBenda = Slider(canvas, 40, 50, 300, 10, min=10, max=170, step=1)
-    output_tinggiBenda = TextBox(canvas, 750, 50, 34, 31, fontSize=16)
+    output_tinggiBenda = TextBox(canvas, 750, 50, 40, 31, fontSize=16)
 
     slider_jarakFokus = Slider(canvas, 40, 80, 300, 10, min=10, max=210, step=1)
-    output_jarakFokus = TextBox(canvas, 750, 80, 34, 31, fontSize=16)
+    output_jarakFokus = TextBox(canvas, 750, 80, 40, 31, fontSize=16)
+
+    output_jarakBayangan = TextBox(canvas, 750, 110, 40, 31, fontSize=16)
+    output_tinggiBayangan = TextBox(canvas, 750, 140, 40, 31, fontSize=16)
 
     output_jarakBenda.disable()
     output_tinggiBenda.disable()
     output_jarakFokus.disable()
+    output_jarakBayangan.disable()
+    output_tinggiBayangan.disable()
 
+        # Update labels
+    label_jarakBenda = font.render("Jarak Benda:", True, (0, 0, 0))
+    label_tinggiBenda = font.render("Tinggi Benda:", True, (0, 0, 0))
+    label_jarakFokus = font.render("Titik Fokus:", True, (0, 0, 0))
+    label_jarakBayangan = font.render("Jarak Bayangan:", True, (0, 0, 0))
+    label_tinggiBayangan = font.render("Tinggi Bayangan:", True, (0, 0, 0))
 
     while True:
         for event in pygame.event.get():
@@ -235,9 +264,22 @@ def main():
         tinggi_benda = slider_tinggiBenda.getValue()
         titik_fokus = slider_jarakFokus.getValue()
         
-
         jarakBayangan = int(jarak_bayangan(jarak_benda, titik_fokus))
         tinggiBayangan = int(tinggi_bayangan(tinggi_benda, jarak_benda, titik_fokus))
+
+        # Render labels
+        canvas.blit(label_jarakBenda, (664, 25))
+        canvas.blit(label_tinggiBenda, (656, 55))
+        canvas.blit(label_jarakFokus, (671, 85))
+        canvas.blit(label_jarakBayangan, (640, 115))
+        canvas.blit(label_tinggiBayangan, (633, 145))
+
+        if jarak_benda == titik_fokus:
+            output_jarakBayangan.setText("INF")
+            output_tinggiBayangan.setText("INF")
+        else:
+            output_jarakBayangan.setText(str(jarakBayangan))
+            output_tinggiBayangan.setText(str(tinggiBayangan))
 
         #menggambar 
         gambar_garis_vertikal_dan_horizontal(canvas, width, height)
@@ -247,7 +289,7 @@ def main():
         gambar_bayangan(canvas, width, height, jarakBayangan, tinggiBayangan, font)
         gambar_garis_istimewa_1(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan)
         gambar_garis_istimewa_2(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan)
-
+        gambar_garis_istimewa_3(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan)
         # draw_half_ellipse(canvas, 255,0,0,)
         pygame.display.flip()
 
