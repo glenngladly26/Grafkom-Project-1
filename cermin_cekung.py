@@ -43,7 +43,6 @@ def draw_line_modif(canvas, x1, y1, x2, y2, r, g ,b):
         else:
             steps = abs(dy)
         
-    
     x_increment = dx / steps
     y_increment = dy / steps
 
@@ -89,11 +88,28 @@ def tinggi_bayangan(tinggi_benda, jarak_benda, titik_fokus):
     tinggi_bayang = pembesaran(jarak_benda, titik_fokus)*(tinggi_benda)
     return tinggi_bayang
 
+def draw_cermin_cekung(canvas, R, G, B):
+    width, height = canvas.get_width(), canvas.get_height()
+    color = (R, G, B)
+    h, k = 375, 300     # titik x dan y
+    a = 30              # Besar sumbu horizontal
+    b = 200             # Besar sumbu vertikal
+
+    for y in range(k - b, k + b + 1):
+        x = h + int((a * ((1 - ((y - k) / b)**2))**0.5))
+        if 0 <= x < width and 0 <= y < height:
+            pygame.draw.circle(canvas, color, (x, y), 1)
+
 def gambar_garis_vertikal_dan_horizontal(canvas, width, height):
+    #vertikal
     x1, y1 = int(width / 2), 0
     x2, y2 = int(width / 2), height
     draw_line(canvas, x1, y1, x2, y2, 0, 0, 0)
+    
+    R, G, B = 0,0,0
+    draw_cermin_cekung(canvas, R, G, B)
 
+    #horizontal
     x1, y1 = 0, height / 2
     x2, y2 = width, height / 2
     draw_line(canvas, x1, y1, x2, y2, 0, 0, 0)
@@ -178,6 +194,7 @@ def gambar_garis_istimewa_2(canvas, width, height, titik_fokus, jarak_benda, tin
     x2, y2 = konv_layar(jarakBayangan, -tinggiBayangan, width, height)
     draw_line_modif(canvas, x1, y1, x2, y2, 1, 117, 24)
 
+
 def main():
     width, height = 800, 600
     canvas = pygame.display.set_mode((width, height))
@@ -190,7 +207,7 @@ def main():
     slider_jarakBenda = Slider(canvas, 40, 20, 300, 10, min=10, max=410, step=1)
     output_jarakBenda = TextBox(canvas, 750, 20, 34, 31, fontSize=16)
 
-    slider_tinggiBenda = Slider(canvas, 40, 50, 300, 10, min=10, max=310, step=1)
+    slider_tinggiBenda = Slider(canvas, 40, 50, 300, 10, min=10, max=170, step=1)
     output_tinggiBenda = TextBox(canvas, 750, 50, 34, 31, fontSize=16)
 
     slider_jarakFokus = Slider(canvas, 40, 80, 300, 10, min=10, max=210, step=1)
@@ -199,6 +216,7 @@ def main():
     output_jarakBenda.disable()
     output_tinggiBenda.disable()
     output_jarakFokus.disable()
+
 
     while True:
         for event in pygame.event.get():
@@ -230,6 +248,7 @@ def main():
         gambar_garis_istimewa_1(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan)
         gambar_garis_istimewa_2(canvas, width, height, titik_fokus, jarak_benda, tinggi_benda, jarakBayangan, tinggiBayangan)
 
+        # draw_half_ellipse(canvas, 255,0,0,)
         pygame.display.flip()
 
 if __name__== "__main__":
